@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
 import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
 import { CoursesService } from '../services/courses.services';
+import { LoadingService } from '../loading/loading.service';
 
 
 @Component({
@@ -21,7 +22,7 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
 
-  constructor(private coursesServices: CoursesService) {
+  constructor(private coursesServices: CoursesService, private loadingService: LoadingService) {
 
   }
 
