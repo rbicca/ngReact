@@ -22,7 +22,7 @@ export class HomeComponent implements OnInit {
   advancedCourses$: Observable<Course[]>;
 
 
-  constructor(private coursesServices: CoursesService, private loadingService: LoadingService) {
+  constructor(private coursesServices: CoursesService, public loadingService: LoadingService) {
 
   }
 
@@ -31,17 +31,40 @@ export class HomeComponent implements OnInit {
   }
 
   reloadCourses(){
-    const courses$ = this.coursesServices.loadAllCourses().pipe(
-      map(courses => courses.sort(sortCoursesBySeqNo))
-    );
 
-    this.beginnerCourses$ = courses$.pipe(
+    //Alterinativa 1 => Ligando e desligando o loader manualmente
+    // this.loadingService.loadingOn();
+
+    // const courses$ = this.coursesServices.loadAllCourses().pipe(
+    //   map(courses => courses.sort(sortCoursesBySeqNo)),
+    //   finalize((() => this.loadingService.loadingOff())
+    //   )
+    // );
+
+    // this.beginnerCourses$ = courses$.pipe(
+    //   map(courses => courses.filter(c => c.category === "BEGINNER"))
+    // );
+
+    // this.advancedCourses$ = courses$.pipe(
+    //   map(courses => courses.filter(c => c.category === "ADVANCED"))
+    // );
+
+
+    //Alterntiva 2
+    const courses$ = this.coursesServices.loadAllCourses().pipe(
+      map(courses => courses.sort(sortCoursesBySeqNo)),
+      );
+    const loadCourses$ =  this.loadingService.showLoaderUntilCompleted(courses$); 
+      
+    this.beginnerCourses$ = loadCourses$.pipe(
       map(courses => courses.filter(c => c.category === "BEGINNER"))
     );
 
-    this.advancedCourses$ = courses$.pipe(
+    this.advancedCourses$ = loadCourses$.pipe(
       map(courses => courses.filter(c => c.category === "ADVANCED"))
     );
+
+
   }
 
 
