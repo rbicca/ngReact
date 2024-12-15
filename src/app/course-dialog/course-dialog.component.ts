@@ -7,12 +7,14 @@ import moment from 'moment';
 import {catchError} from 'rxjs/operators';
 import {throwError} from 'rxjs';
 import { LoadingService } from '../loading/loading.service';
+import { MessagesService } from '../messages/messages.service';
 
 @Component({
     selector: 'course-dialog',
     templateUrl: './course-dialog.component.html',
     styleUrls: ['./course-dialog.component.css'],
-    standalone: false
+    standalone: false,
+    providers:[LoadingService ,MessagesService]
 })
 export class CourseDialogComponent implements AfterViewInit {
 
@@ -25,6 +27,7 @@ export class CourseDialogComponent implements AfterViewInit {
         private fb: FormBuilder,
         private dialogRef: MatDialogRef<CourseDialogComponent>,
         private loadingService: LoadingService,
+        private messagesService: MessagesService,
         @Inject(MAT_DIALOG_DATA) course:Course) {
 
         this.course = course;
@@ -46,7 +49,16 @@ export class CourseDialogComponent implements AfterViewInit {
 
       const changes = this.form.value;
 
-      this.coursesService.saveCourse(this.course.id, changes)
+      const saveCourse$ =  this.coursesService.saveCourse(this.course.id, changes).pipe(
+        catchError(err => {
+            const message = "Erro ao gravar o curso";
+            console.log(message, err);
+            this.messagesService.showErrors(message);
+            return throwError(err);
+        }),
+      );
+
+      this.loadingService.showLoaderUntilCompleted(saveCourse$)
         .subscribe(
           (val) => { this.dialogRef.close(val);}
         );
