@@ -15,6 +15,7 @@ import {
 } from 'rxjs/operators';
 import {merge, fromEvent, Observable, concat, throwError} from 'rxjs';
 import {Lesson} from '../model/lesson';
+import { CoursesService } from '../services/courses.services';
 
 
 @Component({
@@ -25,18 +26,18 @@ import {Lesson} from '../model/lesson';
 })
 export class CourseComponent implements OnInit {
 
-  course: Course;
+  course$: Observable<Course>;
 
-  lessons: Lesson[];
+  lessons$: Observable<Lesson[]>;
 
-  constructor(private route: ActivatedRoute) {
-
-
-  }
+  constructor(private route: ActivatedRoute, private coursesServices: CoursesService) { }
 
   ngOnInit() {
+    const courseId = parseInt(this.route.snapshot.paramMap.get("courseId"));
 
+    this.course$ = this.coursesServices.loadCourseById(courseId);
 
+    this.lessons$ = this.coursesServices.loadAllCoursesLessons(courseId);
 
   }
 
